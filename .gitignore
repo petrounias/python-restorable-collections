@@ -1,0 +1,14 @@
+# Temporary
+*~
+
+# Mac OS
+*.DS_Store
+
+# PyCharm
+.idea/
+
+# Python
+*.pyc
+
+# Sphinx
+docs/build

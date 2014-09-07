@@ -1,0 +1,2 @@
+include *.txt docs/source/conf.oy
+recursive-include docs/source *.rst
