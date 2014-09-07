@@ -1,11 +1,11 @@
-Python Restorable Collections Documentation
-===========================================
+Python Restorable Collections
+=============================
 
 Pickleable wrappers for Python collections with non-built-in type keys and
 cycles or self-references.
 
-Interfaces to :mod:`collections` which solve the problem of unpickleable objects
-when non-built-in type keys are used and form cycles, either mutually or through
+Interfaces to collections which solve the problem of unpickleable objects when
+non-built-in type keys are used and form cycles, either mutually or through
 self-reference.
 
 A detailed article explaining the problem and this solution will soon be
