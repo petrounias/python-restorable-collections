@@ -40,11 +40,11 @@ Obtaining
 Installation
 ============
 
-Via setup tools::
+Via setup tools:
 
     python setup.py install
 
-Via pip and pypi::
+Via pip and pypi:
 
     pip install python-restorable-collections
 
@@ -52,7 +52,7 @@ Via pip and pypi::
 Usage
 =====
 
-Import the collections wrappers from the :mod:`restorable_collections` module.
+Import the collections wrappers from the `restorable_collections` module.
 
     from restorable_collections import RestorableDict
 
