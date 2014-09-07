@@ -59,6 +59,9 @@ class RestorableCollectionsTestCase(TestCase):
     def setUp(self):
         self.pickle = pickle
 
+    def pickle_and_unpickle(self, g):
+        _g = self.pickle.dumps(g)
+        return self.pickle.loads(_g)
 
     def test_dict_no_cycle(self):
 
@@ -77,8 +80,7 @@ class RestorableCollectionsTestCase(TestCase):
         self.assertTrue(c2 in c1.restorable_ordered)
         self.assertTrue(c2 in c1.restorable_default)
 
-        gp = pickle.dumps(g)
-        gu = pickle.loads(gp)
+        gu = self.pickle_and_unpickle(g)
 
         c1u = gu.elements[0]
         c2u = gu.elements[1]
@@ -132,8 +134,7 @@ class RestorableCollectionsTestCase(TestCase):
         self.assertTrue(c1 in c1.restorable_ordered)
         self.assertTrue(c1 in c1.restorable_default)
 
-        gp = pickle.dumps(g)
-        gu = pickle.loads(gp)
+        gu = self.pickle_and_unpickle(g)
 
         c1u = gu.elements[0]
         c2u = gu.elements[1]
@@ -257,8 +258,7 @@ class RestorableCollectionsTestCase(TestCase):
         self.assertTrue(c1 in c2.restorable_ordered)
         self.assertTrue(c1 in c2.restorable_default)
 
-        gp = pickle.dumps(g)
-        gu = pickle.loads(gp)
+        gu = self.pickle_and_unpickle(g)
 
         c1u = gu.elements[0]
         c2u = gu.elements[1]
@@ -360,8 +360,7 @@ class RestorableCollectionsTestCase(TestCase):
         self.assertTrue(d2 in d1.plain)
         self.assertTrue(d2 in d1.restorable_plain)
 
-        gp = pickle.dumps(g)
-        gu = pickle.loads(gp)
+        gu = self.pickle_and_unpickle(g)
 
         d1u = gu.elements[0]
         d2u = gu.elements[1]
@@ -391,8 +390,7 @@ class RestorableCollectionsTestCase(TestCase):
         self.assertTrue(d1 in d1.plain)
         self.assertTrue(d1 in d1.restorable_plain)
 
-        gp = pickle.dumps(g)
-        gu = pickle.loads(gp)
+        gu = self.pickle_and_unpickle(g)
 
         d1u = gu.elements[0]
         d2u = gu.elements[1]
@@ -432,8 +430,7 @@ class RestorableCollectionsTestCase(TestCase):
         self.assertTrue(d1 in d2.plain)
         self.assertTrue(d1 in d2.restorable_plain)
 
-        gp = pickle.dumps(g)
-        gu = pickle.loads(gp)
+        gu = self.pickle_and_unpickle(g)
 
         d1u = gu.elements[0]
         d2u = gu.elements[1]
