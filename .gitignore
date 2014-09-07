@@ -12,3 +12,8 @@
 
 # Sphinx
 docs/build
+
+# Setup Tools and PyPI
+build
+dist
+python_restorable_collections.egg-info

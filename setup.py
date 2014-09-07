@@ -41,12 +41,13 @@ __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
 # Setup tools
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name = 'python-restorable-collections',
-    version = ":versiontools:restorable_collections:VERSION",
-    packages = find_packages(),
+    version = "1.0.0",
+    packages = ['restorable_collections', ],
+    package_dir = { 'restorable_collections' : 'source/restorable_collections/' },
     author = 'Alexis Petrounias <www.petrounias.org>',
     maintainer = 'Alexis Petrounias <www.petrounias.org>',
     keywords = 'collections, pickle, pickling, unpickling, cPickle, cycles, self-references',
@@ -62,7 +63,6 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    setup_requires = [ 'versiontools >= 1.9.1', ],
     zip_safe = True)
 
 
