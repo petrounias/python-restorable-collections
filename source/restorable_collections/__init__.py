@@ -82,6 +82,11 @@ class Restorable(object):
 
     In order to use :meth:`__init__` must be invoked in the subclass's own
     initialization.
+
+    State is held in :attr:`_restoration_data` and must contain all the
+    information necessary for :meth:`_restore` to complete; inheriting from this
+    class therefore means responsibility for providing appropriate state is with
+    the subclass :meth:`__getstate__`.
     """
 
     def __init__(self):
@@ -118,7 +123,8 @@ class Restorable(object):
         prior to invocation of the restoration logic, implementations of
         :meth:`_restore` are free to access thi object and its wrapped
         :attr:`_contents` without entering an indefinite recursion through this
-        interceptor.
+        interceptor. Sets :attr:`_restoration_data` to None afterwards so that
+        no pointers remain to potentially removed keys.
 
         :param str item: the attribute of interest.
         :return: the value of the attribute.
@@ -126,10 +132,11 @@ class Restorable(object):
         if item == '_contents':
             if self._requires_restoration:
                 self._requires_restoration = False
-                self._restore()
+                self._restore(self._restoration_data)
+                self._restoration_data = None
         return object.__getattribute__(self, item)
 
-    def _restore(self):
+    def _restore(self, restoration_data):
         """
         Abstract method responsible for restoring the state of the wrapped
         :attr:`_contents` prior to first access. This method must be overridden
@@ -140,6 +147,8 @@ class Restorable(object):
         :attr:`_contents` as attribute access interception will only invoke it
         once.
 
+        :param object restoration_data: the restoration data necessary for
+            recreating the wrapped contents
         :raises NotImplementedError: if not overridden by the subclass
         """
         raise NotImplementedError(
@@ -155,9 +164,18 @@ class RestorableDict(MutableMapping, Restorable, object):
         self._contents = dict(*args, **kwargs)
         Restorable.__init__(self)
 
-    def _restore(self):
-        self._contents = { key : value for key, value in \
-            self._contents.iteritems() }
+    def __getstate__(self):
+        return [ (key, value) for key, value in self._contents.iteritems() ]
+
+    def __setstate__(self, state):
+        Restorable.__setstate__(self, {
+            '_contents' : dict(),
+            '_restoration_data' : state,
+        })
+
+    def _restore(self, restoration_data):
+        for (key, value) in restoration_data:
+            self._contents[key] = value
 
     def __getitem__(self, item):
         return self._contents[item]
@@ -186,17 +204,16 @@ class RestorableDefaultDict(RestorableDict, object):
     def __init__(self, *args, **kwargs):
         self._contents = defaultdict(*args, **kwargs)
         Restorable.__init__(self)
-        self._restoration_pairs = None
+
+    def __getstate__(self):
+        return (self._contents.default_factory,
+            [ (key, value) for key, value in self._contents.iteritems() ])
 
     def __setstate__(self, state):
-        Restorable.__setstate__(self, state)
-        self._restoration_pairs = [ (key, value) for key, value in \
-            state['_contents'].iteritems()]
-
-    def _restore(self):
-        self._contents = { key : value for key, value in \
-            self._restoration_pairs }
-        self._restoration_pairs = None
+        Restorable.__setstate__(self, {
+            '_contents' : defaultdict(state[0]),
+            '_restoration_data' : state[1],
+        })
 
     def __repr__(self):
         return """RestorableDefaultDict{}""".format(repr(self._contents))
@@ -210,17 +227,12 @@ class RestorableOrderedDict(RestorableDict, object):
     def __init__(self, *args, **kwargs):
         self._contents = OrderedDict(*args, **kwargs)
         Restorable.__init__(self)
-        self._restoration_pairs = None
 
     def __setstate__(self, state):
-        Restorable.__setstate__(self, state)
-        self._restoration_pairs = [ (key, value) for key, value in \
-            state['_contents'].iteritems()]
-
-    def _restore(self):
-        self._contents = { key : value for key, value in \
-            self._restoration_pairs }
-        self._restoration_pairs = None
+        Restorable.__setstate__(self, {
+            '_contents' : OrderedDict(),
+            '_restoration_data' : state,
+        })
 
     def __repr__(self):
         return """RestorableOrderedDict{}""".format(repr(self._contents))
@@ -235,8 +247,17 @@ class RestorableSet(MutableSet, Restorable, object):
         self._contents = set(*args)
         Restorable.__init__(self)
 
-    def _restore(self):
-        self._contents = set(list(self._contents))
+    def __getstate__(self):
+        return list(self._contents)
+
+    def __setstate__(self, state):
+        Restorable.__setstate__(self, {
+            '_contents' : set(),
+            '_restoration_data' : state,
+        })
+
+    def _restore(self, restoration_data):
+        self._contents.update(restoration_data)
 
     def __contains__(self, x):
         return x in self._contents
